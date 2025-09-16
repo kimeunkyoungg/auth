@@ -5,6 +5,7 @@ import com.rest1.domain.member.member.service.MemberService;
 import com.rest1.domain.post.post.dto.PostDto;
 import com.rest1.domain.post.post.entity.Post;
 import com.rest1.domain.post.post.service.PostService;
+import com.rest1.global.exception.ServiceException;
 import com.rest1.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -92,7 +93,9 @@ public class ApiV1PostController {
 
         //회원 사칭하는 것을 막기 위해 비밀번호 검증
         if(!actor.getPassword().equals(password))
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new ServiceException(
+                    "401-1",
+                    "비밀번호가 일치하지 않습니다.");
 
         Post post = postService.write(actor, reqBody.title, reqBody.content);
 
