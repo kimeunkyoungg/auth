@@ -10,7 +10,10 @@ public record PostDto(
         LocalDateTime createDate,
         LocalDateTime modifyDate,
         String title,
-        String content
+        String content,
+        Long authorId,
+        String authorName
+        //Member author
 ) {
     public PostDto(Post post) {
         this(
@@ -18,7 +21,10 @@ public record PostDto(
                 post.getCreateDate(),
                 post.getModifyDate(),
                 post.getTitle(),
-                post.getContent()
+                post.getContent(),
+                post.getAuthor().getId(),
+                post.getAuthor().getName() //nickname으로 넘어옴
+
         );
     }
 }
