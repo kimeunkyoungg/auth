@@ -85,22 +85,21 @@ public class ApiV1PostController {
     @Transactional
     public RsData<PostWriteResBody> createItem(
             @RequestBody @Valid PostWriteReqBody reqBody,
-            @NotBlank @Size(min=2, max=30) @RequestParam String username,
-            @NotBlank @Size(min=2, max=30) @RequestParam String password
+            @NotBlank @Size(min=30, max=40) @RequestParam String apiKey
     ) {
 
-        Member actor = memberService.findByUserName(username).get();
-
-        //회원 사칭하는 것을 막기 위해 비밀번호 검증
-        if(!actor.getPassword().equals(password))
-            throw new ServiceException(
-                    "401-1",
-                    "비밀번호가 일치하지 않습니다.");
-
+        Member actor = memberService.findByApiKey(apiKey)
+                .orElseThrow(()
+                        -> new ServiceException("404-1", "API 키가 올바르지 않습니다."));
         Post post = postService.write(actor, reqBody.title, reqBody.content);
 
+        //회원 사칭하는 것을 막기 위해 비밀번호 검증
+//        if(!actor.getPassword().equals(password))
+//            throw new ServiceException(
+//                    "401-1",
+//                    "비밀번호가 일치하지 않습니다.");
 
-        System.out.println("createItem 메서드 실행");
+
 
         return new RsData<>(
                 "201-1",
