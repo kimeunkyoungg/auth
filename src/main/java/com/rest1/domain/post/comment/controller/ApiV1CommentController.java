@@ -89,7 +89,7 @@ public class ApiV1CommentController {
             @NotBlank @Size(min=2, max=30) @RequestParam String username
     ) {
 
-        Member actor = memberService.findByUserName(username).get(); //임시로 고정
+        Member actor = memberService.findByUsername(username).get(); //임시로 고정
 
         Post post = postService.findById(postId).get();
         Comment comment = postService.writeComment(actor, post, reqBody.content);
