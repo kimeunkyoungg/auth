@@ -3,16 +3,14 @@ package com.rest1.domain.member.member.controller;
 import com.rest1.domain.member.member.dto.MemberDto;
 import com.rest1.domain.member.member.entity.Member;
 import com.rest1.domain.member.member.service.MemberService;
+import com.rest1.global.exception.ServiceException;
+import com.rest1.global.rq.Rq;
 import com.rest1.global.rsData.RsData;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import com.rest1.global.exception.ServiceException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApiV1MemberController {
 
     private final MemberService memberService;
+    private final Rq rq;
 
     record JoinReqBody(
             @NotBlank
@@ -93,6 +92,25 @@ public class ApiV1MemberController {
                 new LoginResBody(
                         new MemberDto(member),
                         member.getApiKey()
+                )
+        );
+    }
+
+    record MeResBody(
+            MemberDto memberDto
+    ) {
+    }
+
+    @GetMapping("/me")
+    public RsData<MemberDto> me() {
+
+        Member actor = rq.getActor();
+
+        return new RsData(
+                "200-1",
+                "OK",
+                new MeResBody(
+                        new MemberDto(actor)
                 )
         );
     }

@@ -28,9 +28,10 @@ public class ApiV1PostController {
     private final MemberService memberService;
     private final Rq rq;
 
+
     @GetMapping
-    @Operation(summary = "글 다건 조회")
     @Transactional(readOnly = true)
+    @Operation(summary = "글 다건 조회")
     public List<PostDto> getItems() {
         return postService.findAll().reversed().stream()
                 .map(PostDto::new)
@@ -39,29 +40,27 @@ public class ApiV1PostController {
 
 
     @GetMapping("/{id}")
-    @Operation(summary = "글 단건 조회")
     @Transactional(readOnly = true)
+    @Operation(summary = "글 단건 조회")
     public PostDto getItem(
             @PathVariable Long id
     ) {
-
         Post post = postService.findById(id).get();
         return new PostDto(post);
 
     }
 
-    @Operation(summary = "글 삭제")
+
     @DeleteMapping("/{id}")
+    @Operation(summary = "글 삭제")
     public RsData<Void> deleteItem(
             @PathVariable Long id
     ) {
 
         Member actor = rq.getActor();
         Post post = postService.findById(id).get();
-        post.checkActorDelete(actor);
 
-//        //권한 체크
-//        if(!actor.equals(post.getAuthor())) throw new ServiceException("403-1", "삭제 권한이 없습니다.");
+        post.checkActorDelete(actor);
         postService.delete(post);
 
         return new RsData<Void>(
@@ -94,7 +93,6 @@ public class ApiV1PostController {
             @RequestBody @Valid PostWriteReqBody reqBody
     ) {
 
-        //인증
         Member actor = rq.getActor();
         Post post = postService.write(actor, reqBody.title, reqBody.content);
 
@@ -120,23 +118,17 @@ public class ApiV1PostController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "글 수정")
     @Transactional
+    @Operation(summary = "글 수정")
     public RsData<Void> modifyItem(
             @PathVariable Long id,
             @RequestBody @Valid PostModifyReqBody reqBody
-
-
     ) {
 
         Member actor = rq.getActor();
+
         Post post = postService.findById(id).get();
         post.checkActorModify(actor);
-
-//        //권한 체크
-//        if(!actor.equals(post.getAuthor())) throw new ServiceException("403-1", "수정 권한이 없습니다.");
-
-        //수정 로직
         postService.modify(post, reqBody.title, reqBody.content);
 
         return new RsData(
