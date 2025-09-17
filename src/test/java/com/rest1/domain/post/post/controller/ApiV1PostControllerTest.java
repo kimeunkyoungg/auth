@@ -109,7 +109,7 @@ public class ApiV1PostControllerTest {
     }
 
     @Test
-    @DisplayName("글 생성")
+    @DisplayName("글 작성")
     void t3() throws Exception {
         String title = "제목입니다";
         String content = "내용입니다";
@@ -118,6 +118,7 @@ public class ApiV1PostControllerTest {
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/posts")
+                                .header("Authorization", "Bearer %s".formatted(author.getApiKey()))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -216,9 +217,11 @@ public class ApiV1PostControllerTest {
     void t6() throws Exception {
         long targetId = Integer.MAX_VALUE;
 
+
         ResultActions resultActions = mvc
                 .perform(
                         get("/api/v1/posts/%d".formatted(targetId))
+
                 )
                 .andDo(print());
 
@@ -235,10 +238,13 @@ public class ApiV1PostControllerTest {
         String title = "";
         String content = "내용입니다";
 
+        Member author = memberRepository.findByUsername("user1").get();
+
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/posts")
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer %s".formatted(author.getApiKey()))
                                 .content("""
                                         {
                                             "title": "%s",
@@ -266,11 +272,13 @@ public class ApiV1PostControllerTest {
     void t8() throws Exception {
         String title = "제목입니다.";
         String content = "";
+        Member author = memberRepository.findByUsername("user1").get();
 
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/posts")
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer %s".formatted(author.getApiKey()))
                                 .content("""
                                         {
                                             "title": "%s",
@@ -296,11 +304,13 @@ public class ApiV1PostControllerTest {
     void t9() throws Exception {
         String title = "제목입니다.";
         String content = "내용입니다";
+        Member author = memberRepository.findByUsername("user1").get();
 
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/posts")
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer %s".formatted(author.getApiKey()))
                                 .content("""
                                         {
                                             "title": "%s"
