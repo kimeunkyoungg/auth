@@ -64,6 +64,17 @@ public class GlobalExceptionHandler {
                 e.getMsg()
         );
     }
+
+//    @ExceptionHandler(HandlerMethodValidationException.class)
+//    @ResponseBody
+//    public RsData<Void> handleException(HandlerMethodValidationException e) {
+//
+//        e.printStackTrace(); //로그에 찍히도록함
+//        return new RsData<Void>(
+//                "400-3",
+//                "요청 파라미터가 잘못되었습니다"
+//        );
+//    }
 }
 
 //프로젝트 전반적으로 생기는 에러에 대해 처리를 할 수 있는 클래스

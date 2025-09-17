@@ -85,8 +85,9 @@ public class ApiV1PostController {
     @Transactional
     public RsData<PostWriteResBody> createItem(
             @RequestBody @Valid PostWriteReqBody reqBody,
-            @NotBlank @Size(min=30, max=40) @RequestParam String apiKey
+            @RequestHeader("Authorization") @NotBlank @Size(min=30, max=50)  String apiKey
     ) {
+        String authorization = apiKey.replace("Bearer ", "");
 
         Member actor = memberService.findByApiKey(apiKey)
                 .orElseThrow(()
@@ -98,8 +99,6 @@ public class ApiV1PostController {
 //            throw new ServiceException(
 //                    "401-1",
 //                    "비밀번호가 일치하지 않습니다.");
-
-
 
         return new RsData<>(
                 "201-1",
