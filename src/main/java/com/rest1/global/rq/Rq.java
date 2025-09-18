@@ -5,7 +5,9 @@ package com.rest1.global.rq;
 import com.rest1.domain.member.member.entity.Member;
 import com.rest1.domain.member.member.service.MemberService;
 import com.rest1.global.exception.ServiceException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +17,7 @@ public class Rq {
 
     private final MemberService memberService;
     private final HttpServletRequest request;
+    private final HttpServletResponse response;
 
     public Member getActor() {
 
@@ -34,5 +37,11 @@ public class Rq {
 
         return actor;
     }
-
+    public void addCookie(String name, String value) {
+        Cookie cookie = new Cookie(name,value);
+        cookie.setDomain("localhost");
+        cookie.setPath("/");
+        cookie.setHttpOnly(true); //자바스크립트로 조작 불가능하도록
+        response.addCookie(cookie);
+    }
 }
