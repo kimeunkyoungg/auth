@@ -106,9 +106,18 @@ public class AuthTokenServiceTest {
     @DisplayName("AuthTokenService를 통해서 accessToken 생성")
     void t4() {
 
-        Member member1 = memberRepository.findByUsername("user1").get();
-        String accessToken = authTokenService.genAccessToken(member1); //accessToken 만들기
+        Member member1 = memberRepository.findByUsername("user3").get();
+        String accessToken = authTokenService.genAccessToken(member1);
         assertThat(accessToken).isNotBlank();
+
+        Map<String, Object> payload = authTokenService.payloadOrNull(accessToken);
+
+        assertThat(payload).containsAllEntriesOf(
+                Map.of(
+                        "id", member1.getId(),
+                        "username", member1.getUsername()
+                )
+        );
 
         System.out.println("accessToken = " + accessToken);
     }
