@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class ApiV1MemberController {
 
     private final MemberService memberService;
+
     private final Rq rq;
 
     record JoinReqBody(
@@ -71,7 +72,8 @@ public class ApiV1MemberController {
 
     record LoginResBody(
             MemberDto memberDto,
-            String apiKey
+            String apiKey,
+            String accessToken
     ) {
     }
 
@@ -88,14 +90,18 @@ public class ApiV1MemberController {
             throw new ServiceException("401-2", "비밀번호가 일치하지 않습니다.");
         }
 
+        String accessToken = memberService.genAccessToken(member);
+
         rq.addCookie("apiKey", member.getApiKey());
+        rq.addCookie("accessToken", accessToken);
 
         return new RsData(
                 "200-1",
                 "%s님 환영합니다.".formatted(reqBody.username),
                 new LoginResBody(
                         new MemberDto(member),
-                        member.getApiKey()
+                        member.getApiKey(),
+                        accessToken
                 )
         );
     }

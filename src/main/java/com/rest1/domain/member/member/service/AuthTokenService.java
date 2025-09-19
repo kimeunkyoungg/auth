@@ -18,7 +18,7 @@ public class AuthTokenService{
     private long expireSeconds;
 
     //토큰 생성. 토큰 전문가
-    public String genAccessToken(Member member) {
+    String genAccessToken(Member member) {
 
         return Ut.jwt.toString(
                 secretPattern,
@@ -28,7 +28,7 @@ public class AuthTokenService{
     }
 
 
-    public Map<String, Object> payloadOrNull(String jwt){
+    Map<String, Object> payloadOrNull(String jwt){
         Map<String, Object> payload = Ut.jwt.payloadOrNull(jwt, secretPattern);
 
         if(payload == null){
