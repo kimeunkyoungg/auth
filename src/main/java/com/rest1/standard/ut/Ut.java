@@ -54,15 +54,21 @@ public class Ut {
             return true;
         }
 
-        public static Map<String, Object> payload(String jwt, String secretPattern) {
+        public static Map<String, Object> payloadOrNull(String jwt, String secretPattern) {
+
             SecretKey secretKey = Keys.hmacShaKeyFor(secretPattern.getBytes(StandardCharsets.UTF_8));
 
-            return (Map<String, Object>) Jwts
-                    .parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parse(jwt)
-                    .getPayload();
+            //valid 검사를 하고 해당 과정을 하는 것이 좋다
+            if(isValid(jwt, secretPattern)){
+                return (Map<String, Object>) Jwts
+                        .parser()
+                        .verifyWith(secretKey)
+                        .build()
+                        .parse(jwt)
+                        .getPayload();
+            }
+
+            return null;
         }
     }
 }

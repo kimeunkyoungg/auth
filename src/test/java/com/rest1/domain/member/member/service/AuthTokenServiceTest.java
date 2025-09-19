@@ -94,7 +94,7 @@ public class AuthTokenServiceTest {
         boolean validResult = Ut.jwt.isValid(jwt, secretPattern); // 유효한 토큰인지 먼저 확인하는 과정이 필요하다.
         assertThat(validResult).isTrue();
 
-        Map<String, Object> parsedPayload = Ut.jwt.payload(jwt,secretPattern); //역직렬화. map이 나오도록
+        Map<String, Object> parsedPayload = Ut.jwt.payloadOrNull(jwt,secretPattern); //역직렬화. map이 나오도록
 
         assertThat(parsedPayload)
                 .containsAllEntriesOf(payload);
