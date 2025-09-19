@@ -6,6 +6,7 @@ import com.rest1.domain.member.member.service.MemberService;
 import com.rest1.global.exception.ServiceException;
 import com.rest1.global.rq.Rq;
 import com.rest1.global.rsData.RsData;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/members")
+@SecurityRequirement(name = "bearerAuth")
 public class ApiV1MemberController {
 
     private final MemberService memberService;
