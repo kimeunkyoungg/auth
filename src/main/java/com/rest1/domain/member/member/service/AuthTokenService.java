@@ -15,6 +15,7 @@ public class AuthTokenService{
     private String secretPattern = "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890";
 
 
+    //토큰 생성. 토큰 전문가
     public String genAccessToken(Member member) {
 
         return Ut.jwt.toString(
