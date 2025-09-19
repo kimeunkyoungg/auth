@@ -76,19 +76,28 @@ public class AuthTokenServiceTest {
         System.out.println("jwt = " + jwt);
     }
 
+    //Ut를 통해 추상화함
+    //Test2와 동일한 작업
     @Test
     @DisplayName("Ut.jwt.toString 를 통해서 JWT 생성, {name=\"Paul\", age=23}")
     void t3() {
+
+        Map<String, Object> payload =  Map.of("name", "Paul", "age", 23);
         String jwt = Ut.jwt.toString(
                 secretPattern,
                 expireSeconds,
-                Map.of("name", "Paul", "age", 23)
+                payload
         );
 
         assertThat(jwt).isNotBlank();
 
         boolean validResult = Ut.jwt.isValid(jwt, secretPattern); // 유효한 토큰인지 먼저 확인하는 과정이 필요하다.
         assertThat(validResult).isTrue();
+
+        Map<String, Object> parsedPayload = Ut.jwt.payload(jwt,secretPattern); //역직렬화. map이 나오도록
+
+        assertThat(parsedPayload)
+                .containsAllEntriesOf(payload);
 
         System.out.println("jwt = " + jwt);
     }
