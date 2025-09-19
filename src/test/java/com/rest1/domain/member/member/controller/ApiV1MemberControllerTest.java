@@ -122,6 +122,7 @@ public class ApiV1MemberControllerTest {
 
         Member member = memberRepository.findByUsername(username).get();
 
+        //로그인
         resultActions
                 .andExpect(handler().handlerType(ApiV1MemberController.class))
                 .andExpect(handler().methodName("login"))
@@ -129,13 +130,17 @@ public class ApiV1MemberControllerTest {
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
                 .andExpect(jsonPath("$.msg").value("%s님 환영합니다.".formatted(username)))
                 .andExpect(jsonPath("$.data.apiKey").exists())
+                .andExpect(jsonPath("$.data.accessToken").exists()) //토큰 확인
                 .andExpect(jsonPath("$.data.memberDto.id").value(member.getId()))
                 .andExpect(jsonPath("$.data.memberDto.createDate").value(Matchers.startsWith(member.getCreateDate().toString().substring(0, 20))))
                 .andExpect(jsonPath("$.data.memberDto.modifyDate").value(Matchers.startsWith(member.getModifyDate().toString().substring(0, 20))))
                 .andExpect(jsonPath("$.data.memberDto.name").value(member.getName()));
 
+        //쿠키
         resultActions.andExpect(
                 result -> {
+
+                    //apiKey쿠키 존재하는지 확인
                     Cookie apiKeyCookie = result.getResponse().getCookie("apiKey");
                     assertThat(apiKeyCookie).isNotNull();
 
@@ -146,6 +151,14 @@ public class ApiV1MemberControllerTest {
                     if(apiKeyCookie != null) {
                         assertThat(apiKeyCookie.getValue()).isNotBlank();
                     }
+
+                    //accessToken 존재하는지 확인
+                    Cookie accessTokenCookie = result.getResponse().getCookie("accessToken");
+                    assertThat(apiKeyCookie).isNotNull();
+
+                    assertThat(apiKeyCookie.getPath()).isEqualTo("/");
+                    assertThat(apiKeyCookie.getDomain()).isEqualTo("localhost");
+                    assertThat(apiKeyCookie.isHttpOnly()).isEqualTo(true);
                 }
         );
 
