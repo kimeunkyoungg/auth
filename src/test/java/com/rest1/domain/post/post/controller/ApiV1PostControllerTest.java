@@ -4,9 +4,11 @@ import com.rest1.domain.member.member.entity.Member;
 import com.rest1.domain.member.member.repository.MemberRepository;
 import com.rest1.domain.post.post.entity.Post;
 import com.rest1.domain.post.post.repository.PostRepository;
+import com.rest1.standard.ut.Ut;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -14,6 +16,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInRelativeOrder;
@@ -36,6 +40,14 @@ public class ApiV1PostControllerTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Value("${custom.jwt.secretPattern}")
+    private String secretPattern;
+
+    @Value("${custom.jwt.expireSeconds}")
+    private long expireSeconds;
+
+
 
     @Test
     @DisplayName("글 다건 조회")
@@ -170,7 +182,7 @@ public class ApiV1PostControllerTest {
                 .andExpect(handler().methodName("createItem"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.resultCode").value("401-1"))
-                .andExpect(jsonPath("$.msg").value("헤더에 인증 정보가 없습니다."));
+                .andExpect(jsonPath("$.msg").value("로그인 후 이용해주세요."));
     }
 
     @Test
@@ -378,7 +390,7 @@ public class ApiV1PostControllerTest {
                 .andExpect(handler().methodName("createItem"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.resultCode").value("401-2"))
-                .andExpect(jsonPath("$.msg").value("헤더의 인증 정보 형식이 올바르지 않습니다."));
+                .andExpect(jsonPath("$.msg").value("Authorization 헤더가 Bearer 형식이 아닙니다."));
     }
 
     @Test
@@ -408,7 +420,7 @@ public class ApiV1PostControllerTest {
                 .andExpect(handler().methodName("createItem"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.resultCode").value("401-3"))
-                .andExpect(jsonPath("$.msg").value("API 키가 올바르지 않습니다."));
+                .andExpect(jsonPath("$.msg").value("API 키가 유효하지 않습니다."));
     }
 
     @Test
@@ -440,7 +452,7 @@ public class ApiV1PostControllerTest {
                 .andExpect(handler().methodName("modifyItem"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.resultCode").value("403-1"))
-                .andExpect(jsonPath("$.msg").value("수정 권한이 없습니다."));
+                .andExpect(jsonPath("$.msg").value("수정 권한이 없습니다"));
     }
 
     @Test
@@ -463,7 +475,40 @@ public class ApiV1PostControllerTest {
                 .andExpect(handler().methodName("deleteItem"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.resultCode").value("403-2"))
-                .andExpect(jsonPath("$.msg").value("삭제 권한이 없습니다."));
+                .andExpect(jsonPath("$.msg").value("삭제 권한이 없습니다"));
 
+    }
+
+    @Test
+    @DisplayName("글 작성, 유효한 엑세스 토큰, 잘못된 apiKey")
+    void t15() throws Exception {
+        String title = "제목입니다";
+        String content = "내용입니다";
+        Member author = memberRepository.findByUsername("user1").get();
+
+        String accessToken = Ut.jwt.toString(
+                secretPattern,
+                expireSeconds,
+                Map.of("id", author.getId(), "username", author.getUsername())
+        );
+
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/api/v1/posts")
+                                .header("Authorization", "Bearer wrong-api-key %s".formatted(accessToken))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "title": "%s",
+                                            "content": "%s"
+                                        }
+                                        """.formatted(title, content))
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("createItem"))
+                .andExpect(status().isCreated());
     }
 }

@@ -38,9 +38,11 @@ public class AuthTokenService{
         //payload로만 반환을 하면 값이 변환이 될 수도 있고,
         //payload 안에는 내가 필요한 id, name 제외하고 다른 데이터들도 많음
         //원하는 데이터만 받기 위해 전처리 과정을 해준다.
-        int id = (int)payload.get("id");
+        Number idNo = (Number)payload.get("id");
+        long id = idNo.longValue();
+
         String username = (String)payload.get("username");
 
-        return Map.of("id", (long)id, "username", username);
+        return Map.of("id", id, "username", username);
     }
 }
