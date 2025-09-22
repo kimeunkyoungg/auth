@@ -43,4 +43,9 @@ public class Member extends BaseEntity {
     public void updateApiKey(String apiKey) {
         this.apiKey = apiKey;
     }
+
+    //일단은 간단하게 이름이 admin인 사람이 관리자로 설정
+    public boolean isAdmin() {
+        return "admin".equals(username);
+    }
 }
