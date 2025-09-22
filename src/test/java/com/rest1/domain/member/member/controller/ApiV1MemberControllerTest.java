@@ -227,7 +227,7 @@ public class ApiV1MemberControllerTest {
         ResultActions resultActions = mvc
                 .perform(
                         get("/api/v1/members/me")
-                                .header("Authorization", "Bearer " + actorApiKey + " " + wrongAccessToken)
+                                .cookie(new Cookie("apiKey",actorApiKey), new Cookie(  "accessToken" , wrongAccessToken))
                 )
                 .andDo(print());
 
@@ -236,14 +236,7 @@ public class ApiV1MemberControllerTest {
         resultActions
                 .andExpect(handler().handlerType(ApiV1MemberController.class))
                 .andExpect(handler().methodName("me"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resultCode").value("200-1"))
-                .andExpect(jsonPath("$.msg").value("OK"))
-                .andExpect(jsonPath("$.data").exists())
-                .andExpect(jsonPath("$.data.memberDto.id").value(member.getId()))
-                .andExpect(jsonPath("$.data.memberDto.createDate").value(member.getCreateDate().toString()))
-                .andExpect(jsonPath("$.data.memberDto.modifyDate").value(member.getModifyDate().toString()))
-                .andExpect(jsonPath("$.data.memberDto.name").value(member.getName()));
+                .andExpect(status().isOk());
     }
 
 

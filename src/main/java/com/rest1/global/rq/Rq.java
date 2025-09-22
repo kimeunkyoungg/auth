@@ -47,7 +47,10 @@ public class Rq {
 
         Member member = null;
 
-        if (!accessToken.isBlank()) {
+        boolean isAccessTokenExists = !accessToken.isBlank(); //존재 여부 확인
+        boolean isAccessTokenValid = false; //유효한 토큰인지 아닌지
+
+        if (isAccessTokenExists) {
             Map<String, Object> payload = memberService.payloadOrNull(accessToken); //인증 과정
 
             if (payload != null) {
@@ -56,6 +59,7 @@ public class Rq {
                 String nickname = (String) payload.get("nickname");
 
                 member = new Member(id, username, nickname);
+                isAccessTokenValid = true;
             }
         }
 
@@ -65,7 +69,19 @@ public class Rq {
                     .orElseThrow(() -> new ServiceException("401-3", "API 키가 유효하지 않습니다."));
         }
 
+        //액세스 토큰이 있지만 유효하지 않은 경우 -> 새로운 토큰 만든다
+        if(isAccessTokenExists && !isAccessTokenValid){
+            String newAccessToken = memberService.genAccessToken(member);
+            setCookie("accessToken", newAccessToken);
+            setHeader("accessToken", newAccessToken);
+        }
+
+
         return member;
+    }
+
+    private void setHeader(String name, String value){
+        response.setHeader(name, value);
     }
 
     private String getHeader(String name, String defaultValue) {
